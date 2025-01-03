@@ -1,7 +1,8 @@
 import os
 import sys
 import gzip
-import imp
+#import imp
+import importlib.util
 from itertools import product
 from setuptools import setup, find_packages
 
@@ -38,14 +39,19 @@ else:
             os.remove(compressed_path)
             print('Removing compressed file')
 
-version = imp.load_source('openl3.version', os.path.join('openl3', 'version.py'))
+#version = imp.load_source('openl3.version', os.path.join('openl3', 'version.py'))
+spec = importlib.util.spec_from_file_location('openl3.version', os.path.join('openl3', 'version.py'))
+version_module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(version_module)
+version = version_module.version
+
 
 with open('README.md', encoding='utf8') as file:
     long_description = file.read()
 
 setup(
     name='openl3',
-    version=version.version,
+    version=version_module.version,
     description='Deep audio and image embeddings, based on Look, Listen, and Learn approach',
     long_description=long_description,
     long_description_content_type='text/markdown',
